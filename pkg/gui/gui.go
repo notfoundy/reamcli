@@ -38,8 +38,8 @@ func (gui *Gui) Run() error {
 		return err
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
-		log.Panicln(err)
+	if err = gui.keybindings(g); err != nil {
+		return err
 	}
 
 	if err := g.MainLoop(); err != nil && !errors.Is(err, gocui.ErrQuit) {
@@ -49,6 +49,6 @@ func (gui *Gui) Run() error {
 	return nil
 }
 
-func quit(g *gocui.Gui, v *gocui.View) error {
+func (gui *Gui) quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }

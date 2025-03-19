@@ -8,14 +8,7 @@ func (gui *Gui) layout(g *gocui.Gui) error {
 	g.Highlight = true
 
 	for _, v := range gui.getViews() {
-		// view, err := g.View(v.name)
-		// if err != nil {
-		// 	return nil
-		// }
 		frameOffset := 1
-		// if view.Frame {
-		// 	frameOffset = 0
-		// }
 		pos := gui.getPositionByViewName(v.name, frameOffset)
 		g.SetView(v.name, pos.x0, pos.y0, pos.x1, pos.y1, 0)
 	}

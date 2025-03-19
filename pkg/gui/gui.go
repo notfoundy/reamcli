@@ -5,16 +5,19 @@ import (
 	"log"
 
 	"github.com/awesome-gocui/gocui"
+	"github.com/sirupsen/logrus"
 )
 
 type Gui struct {
 	g         *gocui.Gui
 	Views     Views
+	Log       *logrus.Logger
 	ErrorChan chan error
 }
 
-func NewGui(errorChan chan error) (*Gui, error) {
+func NewGui(log *logrus.Logger, errorChan chan error) (*Gui, error) {
 	gui := &Gui{
+		Log:       log,
 		ErrorChan: errorChan,
 	}
 

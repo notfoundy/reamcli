@@ -2,10 +2,13 @@ package app
 
 import (
 	"github.com/notfoundy/reamcli/pkg/gui"
+	"github.com/notfoundy/reamcli/pkg/log"
+	"github.com/sirupsen/logrus"
 )
 
 type App struct {
 	Gui       *gui.Gui
+	Log       *logrus.Logger
 	ErrorChan chan error
 }
 
@@ -15,7 +18,8 @@ func NewApp() (*App, error) {
 	}
 
 	var err error
-	app.Gui, err = gui.NewGui(app.ErrorChan)
+	app.Log = log.NewLogger()
+	app.Gui, err = gui.NewGui(app.Log, app.ErrorChan)
 	if err != nil {
 		return app, err
 	}

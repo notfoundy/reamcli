@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/notfoundy/reamcli/pkg/gui"
-	"github.com/notfoundy/reamcli/pkg/log"
+	"github.com/notfoundy/reamcli/internal/gui"
+	"github.com/notfoundy/reamcli/internal/log"
 	"github.com/sirupsen/logrus"
 )
 

@@ -47,6 +47,8 @@ func (gui *Gui) createAllViews() error {
 		(*mapping.viewPtr).FgColor = gocui.ColorDefault
 	}
 
+	gui.Views.Preview.Title = "Preview"
+
 	return nil
 }
 

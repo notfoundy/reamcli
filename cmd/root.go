@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/notfoundy/reamcli/pkg/app"
+	"github.com/notfoundy/reamcli/internal/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

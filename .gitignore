@@ -20,3 +20,6 @@ go.work.sum
 
 # Log file
 *.log
+
+# Env
+.env

@@ -12,7 +12,14 @@ type Gui struct {
 	g         *gocui.Gui
 	Views     Views
 	Log       *logrus.Logger
+	Tabs      Tabs
 	ErrorChan chan error
+}
+
+type Tabs struct {
+	Search  Tab
+	Seasons Tab
+	About   Tab
 }
 
 func NewGui(log *logrus.Logger, errorChan chan error) (*Gui, error) {
@@ -37,6 +44,8 @@ func (gui *Gui) Run() error {
 
 	g.SetManagerFunc(gocui.ManagerFunc(gui.layout))
 
+	gui.setTabs()
+
 	if err := gui.createAllViews(); err != nil {
 		return err
 	}
@@ -54,4 +63,12 @@ func (gui *Gui) Run() error {
 
 func (gui *Gui) quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
+}
+
+func (gui *Gui) setTabs() {
+	gui.Tabs = Tabs{
+		Search:  gui.getSearchTab(),
+		Seasons: gui.getSeasonsTab(),
+		About:   gui.getAboutTab(),
+	}
 }

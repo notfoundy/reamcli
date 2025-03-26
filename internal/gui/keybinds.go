@@ -23,6 +23,18 @@ func (gui *Gui) GetInitialKeybindings() []*Binding {
 			Modifier: gocui.ModNone,
 			Handler:  gui.quit,
 		},
+		{
+			ViewName: "",
+			Key:      ']',
+			Modifier: gocui.ModNone,
+			Handler:  gui.nextTab,
+		},
+		{
+			ViewName: "",
+			Key:      '[',
+			Modifier: gocui.ModNone,
+			Handler:  gui.previousTab,
+		},
 	}
 
 	return bindings

@@ -6,15 +6,18 @@ import (
 
 func (gui *Gui) layout(g *gocui.Gui) error {
 	gui.setViews(gui.g, gui.getViews())
-	gui.setViews(gui.g, gui.getTViews())
 
-	gui.highlighActiveTitleViewTab()
-	gui.applyAlwaysOnTop()
+	if _, err := gui.setTabContent(); err != nil {
+		return err
+	}
+
+	if err := gui.renderPreview("preview"); err != nil {
+		return err
+	}
 
 	// here is a good place log some stuff
 	// if you download humanlog and do tail -f development.log | humanlog
 	// this will let you see these branches as prettified json
-	// gui.Log.Info(utils.AsJson(gui.State.Branches[0:4]))
 	return nil
 }
 
@@ -29,4 +32,17 @@ func (gui *Gui) setViews(g *gocui.Gui, views []ViewMap) error {
 	}
 
 	return nil
+}
+
+func (gui *Gui) setTabContent() (*Tab, error) {
+	tab, err := gui.getCurrentTabOnTop()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := tab.Render(); err != nil {
+		return nil, err
+	}
+
+	return tab, nil
 }

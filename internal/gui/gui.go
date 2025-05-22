@@ -38,8 +38,6 @@ func (gui *Gui) Run() error {
 	}
 	defer g.Close()
 
-	g.Cursor = true
-
 	gui.g = g
 
 	g.SetManagerFunc(gocui.ManagerFunc(gui.layout))
@@ -67,8 +65,8 @@ func (gui *Gui) quit(g *gocui.Gui, v *gocui.View) error {
 
 func (gui *Gui) setTabs() {
 	gui.Tabs = Tabs{
-		Search:  gui.getSearchTab(),
-		Seasons: gui.getSeasonsTab(),
-		About:   gui.getAboutTab(),
+		Search:  gui.setSearchTab(),
+		Seasons: gui.setSeasonsTab(),
+		About:   gui.setAboutTab(),
 	}
 }

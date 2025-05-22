@@ -1,9 +1,10 @@
 module github.com/notfoundy/reamcli
 
-go 1.24.1
+go 1.24.3
 
 require (
 	github.com/awesome-gocui/gocui v1.1.0
+	github.com/darenliang/jikan-go v1.2.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.9.1

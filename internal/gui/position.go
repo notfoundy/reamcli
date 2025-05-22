@@ -26,21 +26,6 @@ func (gui *Gui) getPositionByViewName(name string, frameOffset int) Position {
 		x1 = sideSectionWeight - frameOffset
 		y0 = 1
 		y1 = maxY - 2
-	case "tsearch":
-		x0 = sideSectionWeight + frameOffset
-		x1 = sideSectionWeight + frameOffset + 10
-		y0 = 1
-		y1 = 1
-	case "tseasons":
-		x0 = sideSectionWeight + frameOffset + 12
-		x1 = sideSectionWeight + frameOffset + 22
-		y0 = 1
-		y1 = 1
-	case "tabout":
-		x0 = sideSectionWeight + frameOffset + 24
-		x1 = sideSectionWeight + frameOffset + 33
-		y0 = 1
-		y1 = 1
 	default: // we assume the default case only contain tabs for the main panel
 		x0 = sideSectionWeight + frameOffset
 		x1 = sideSectionWeight + mainSectionWeight - frameOffset - 1

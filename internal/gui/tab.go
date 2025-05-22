@@ -4,48 +4,58 @@ import (
 	"fmt"
 
 	"github.com/awesome-gocui/gocui"
+	"github.com/darenliang/jikan-go"
+	"github.com/notfoundy/reamcli/internal/ani"
 )
 
 type Tab struct {
-	Index    int
-	Key      string
-	Title    string
-	Render   string
-	IsActive bool
+	Index         int
+	Key           string
+	Render        func() error
+	Data          *jikan.Season
+	SelectedIndex int
+	IsActive      bool
 }
 
-func (gui *Gui) getSearchTab() Tab {
+func (gui *Gui) setSearchTab() Tab {
 	return Tab{
-		Index:    0,
-		Key:      "search",
-		Title:    "Search",
-		Render:   gui.renderTest("SEARCH"),
+		Index: 0,
+		Key:   "search",
+		Render: func() error {
+			return gui.renderString(gui.g, "search", "Hello world from search")
+		},
 		IsActive: true,
 	}
 }
 
-func (gui *Gui) getSeasonsTab() Tab {
-	return Tab{
-		Index:    1,
-		Key:      "seasons",
-		Title:    "Seasons",
-		Render:   gui.renderTest("SEASONS"),
+func (gui *Gui) setSeasonsTab() Tab {
+	data, err := ani.GetSeasonNow()
+	if err != nil {
+		return Tab{}
+	}
+
+	tab := Tab{
+		Index: 1,
+		Key:   "seasons",
+		Data:  data,
+		Render: func() error {
+			return gui.renderTabList("seasons")
+		},
 		IsActive: false,
 	}
+
+	return tab
 }
 
-func (gui *Gui) getAboutTab() Tab {
+func (gui *Gui) setAboutTab() Tab {
 	return Tab{
-		Index:    2,
-		Key:      "about",
-		Title:    "About",
-		Render:   gui.renderTest("ABOUT"),
+		Index: 2,
+		Key:   "about",
+		Render: func() error {
+			return gui.renderString(gui.g, "about", "Hello world from about")
+		},
 		IsActive: false,
 	}
-}
-
-func (gui *Gui) renderTest(str string) string {
-	return str
 }
 
 func (gui *Gui) getCurrentTabOnTop() (*Tab, error) {
@@ -111,25 +121,26 @@ func (gui *Gui) previousTab(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func (gui *Gui) highlighActiveTitleViewTab() error {
-	tabs := []*Tab{&gui.Tabs.Search, &gui.Tabs.Seasons, &gui.Tabs.About}
-	for _, t := range tabs {
-		if t.IsActive {
-			v, err := gui.g.View("t" + t.Key)
-			if err != nil {
-				return err
-			}
-			v.Highlight = true
-			v.TitleColor = gocui.ColorGreen
-		} else {
-			v, err := gui.g.View("t" + t.Key)
-			if err != nil {
-				return err
-			}
-			v.Highlight = false
-			v.TitleColor = gocui.ColorDefault
-		}
+func (gui *Gui) nextItem(g *gocui.Gui, v *gocui.View) error {
+	tab, err := gui.getCurrentTabOnTop()
+	if err != nil {
+		return err
 	}
 
-	return nil
+	if tab.SelectedIndex < len(tab.Data.Data)-1 {
+		tab.SelectedIndex++
+	}
+	return gui.renderTabList("seasons")
+}
+
+func (gui *Gui) previousItem(g *gocui.Gui, v *gocui.View) error {
+	tab, err := gui.getCurrentTabOnTop()
+	if err != nil {
+		return err
+	}
+
+	if tab.SelectedIndex > 0 {
+		tab.SelectedIndex--
+	}
+	return gui.renderTabList("seasons")
 }

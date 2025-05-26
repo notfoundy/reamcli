@@ -2,7 +2,6 @@ package gui
 
 import (
 	"github.com/awesome-gocui/gocui"
-	"github.com/sirupsen/logrus"
 )
 
 // Binding - a keybinding mapping a key and modifier to a handler. The keypress
@@ -50,6 +49,17 @@ func (gui *Gui) GetInitialKeybindings() []*Binding {
 		},
 	}
 
+	for _, tab := range gui.allTabs() {
+		bindings = append(bindings,
+			&Binding{
+				ViewName: tab.Key,
+				Key:      gocui.KeyEnter,
+				Modifier: gocui.ModNone,
+				Handler:  gui.handleEnterTab,
+			},
+		)
+	}
+
 	return bindings
 }
 
@@ -60,11 +70,6 @@ func (gui *Gui) keybindings(g *gocui.Gui) error {
 		if err := g.SetKeybinding(binding.ViewName, binding.Key, binding.Modifier, binding.Handler); err != nil {
 			return err
 		}
-		gui.Log.WithFields(logrus.Fields{
-			"view":     binding.ViewName,
-			"key":      binding.Key,
-			"modifier": binding.Modifier,
-		}).Debug("Registered keybinding")
 	}
 
 	return nil

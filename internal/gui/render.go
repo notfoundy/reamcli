@@ -2,6 +2,8 @@ package gui
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/awesome-gocui/gocui"
 )
@@ -57,4 +59,42 @@ func (gui *Gui) renderTabList(viewName string) error {
 	}
 
 	return nil
+}
+
+func (gui *Gui) renderEpisodesList(viewName string) error {
+	tab, err := gui.getCurrentTabOnTop()
+	if err != nil {
+		return err
+	}
+	episodes := tab.Episodes
+	var builder strings.Builder
+
+	for i, item := range episodes.Data.Data {
+		indexStr := fmt.Sprintf("%d - ", i+1)
+		airedSince := formatAiredDate(item.Aired)
+
+		if i == episodes.SelectedIndex {
+			builder.WriteString("\033[31m➤\033[0m ")
+		} else {
+			builder.WriteString("   ")
+		}
+
+		line := fmt.Sprintf("%s - %s  (%s)\n", indexStr, item.Title, airedSince)
+		builder.WriteString(line)
+	}
+
+	return gui.renderString(gui.g, viewName, builder.String())
+}
+
+func formatAiredDate(t time.Time) string {
+	now := time.Now()
+	if t.After(now) {
+		return ""
+	}
+	if t.Year() == now.Year() && t.YearDay() == now.YearDay() {
+		return "today"
+	}
+	days := int(now.Sub(t).Hours() / 24)
+
+	return fmt.Sprintf("%d days ago", days)
 }

@@ -15,6 +15,7 @@ type Tab struct {
 	Data          *jikan.Season
 	SelectedIndex int
 	IsActive      bool
+	Episodes      Episodes
 }
 
 func (gui *Gui) setSearchTab() Tab {
@@ -56,6 +57,10 @@ func (gui *Gui) setAboutTab() Tab {
 		},
 		IsActive: false,
 	}
+}
+
+func (gui *Gui) allTabs() []*Tab {
+	return []*Tab{&gui.Tabs.Search, &gui.Tabs.Seasons, &gui.Tabs.About}
 }
 
 func (gui *Gui) getCurrentTabOnTop() (*Tab, error) {
@@ -143,4 +148,23 @@ func (gui *Gui) previousItem(g *gocui.Gui, v *gocui.View) error {
 		tab.SelectedIndex--
 	}
 	return gui.renderTabList("seasons")
+}
+
+func (gui *Gui) handleEnterTab(g *gocui.Gui, v *gocui.View) error {
+	fromView := v
+	tab, err := gui.getCurrentTabOnTop()
+	if err != nil {
+		return err
+	}
+	selectedItem := tab.Data.Data[tab.SelectedIndex]
+	tab.Episodes = gui.setEpisodesList(selectedItem.MalId)
+	return gui.createEpisodesPopup("List of episodes", func(g *gocui.Gui, v *gocui.View) error {
+		// WARN: will lock you with the episodes popup for now
+		gui.Log.Debug("Func to play the episode")
+		return nil
+	}, func(g *gocui.Gui, v *gocui.View) error {
+		g.DeleteView(v.Name())
+		gui.g.SetCurrentView(fromView.Name())
+		return nil
+	})
 }

@@ -16,6 +16,9 @@ type Views struct {
 	Search  *gocui.View
 	Seasons *gocui.View
 	About   *gocui.View
+
+	// Popups
+	Episodes *gocui.View
 }
 
 type ViewMap struct {

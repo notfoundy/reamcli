@@ -38,7 +38,7 @@ func (gui *Gui) renderTabList(viewName string) error {
 		return err
 	}
 
-	if len(tab.Data.Data) == 0 {
+	if len(tab.Data) == 0 {
 		return gui.renderString(gui.g, viewName, "Loading season anime...")
 	}
 
@@ -46,18 +46,38 @@ func (gui *Gui) renderTabList(viewName string) error {
 	if err != nil {
 		return err
 	}
-
-	// Clear the view and prepare it for rendering.
 	view.Clear()
+	view.SelFgColor = gocui.ColorRed | gocui.AttrBold
+	view.SelBgColor = gocui.ColorBlack
 
-	for i, s := range tab.Data.Data {
+	for i, s := range tab.Data {
 		if i == tab.SelectedIndex {
-			fmt.Fprintf(view, "\033[31m➤\033[0m  %s\n", s.Title)
+			fmt.Fprintf(view, "\033[31m➤\033[0m  %s\n", s.AnimeDetails.Title)
 		} else {
-			fmt.Fprintf(view, "   %s\n", s.Title)
+			fmt.Fprintf(view, "   %s\n", s.AnimeDetails.Title)
 		}
 	}
+	view.SetCursor(0, tab.SelectedIndex)
+	err = gui.scrollToSelectedItem(view, tab.SelectedIndex)
+	if err != nil {
+		return err
+	}
 
+	return nil
+}
+
+func (gui *Gui) scrollToSelectedItem(v *gocui.View, selectedIndex int) error {
+	ox, oy := v.Origin()
+	_, y := v.Size()
+
+	if selectedIndex < oy {
+		return v.SetOrigin(ox, selectedIndex)
+	}
+
+	if selectedIndex >= oy+y {
+		newOrigin := max(selectedIndex-y+1, 0)
+		return v.SetOrigin(ox, newOrigin)
+	}
 	return nil
 }
 

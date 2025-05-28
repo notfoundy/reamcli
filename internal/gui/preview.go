@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/awesome-gocui/gocui"
-	"github.com/darenliang/jikan-go"
+	"github.com/notfoundy/reamcli/internal/ani"
 )
 
 const NO_DATA = "No data to load..."
@@ -16,11 +16,11 @@ func (gui *Gui) renderPreview(viewName string) error {
 		return err
 	}
 
-	if tab.Data == nil || len(tab.Data.Data) == 0 {
+	if len(tab.Data) == 0 {
 		return gui.renderString(gui.g, viewName, NO_DATA)
 	}
 
-	selectedItem := tab.Data.Data[tab.SelectedIndex]
+	selectedItem := tab.Data[tab.SelectedIndex]
 
 	v, err := gui.g.View(viewName)
 	if err != nil {
@@ -28,49 +28,46 @@ func (gui *Gui) renderPreview(viewName string) error {
 	}
 	v.Clear()
 
-	gui.renderTitle(v, selectedItem)
+	gui.renderTitle(v, selectedItem.AnimeDetails)
 	fmt.Fprintln(v)
 	fmt.Fprintf(v, "Information:\n")
-	gui.renderInfo(v, selectedItem)
+	gui.renderInfo(v, selectedItem.AnimeDetails)
 	fmt.Fprintln(v)
-	gui.renderSynopsis(v, selectedItem)
+	gui.renderSynopsis(v, selectedItem.AnimeDetails)
 
 	return nil
 }
 
-func (gui *Gui) renderTitle(v *gocui.View, selectedItem jikan.AnimeBase) {
-	fmt.Fprintf(v, "\033[1;32m%s\033[0m\n", selectedItem.Title)
+func (gui *Gui) renderTitle(v *gocui.View, a ani.AnimeDetails) {
+	fmt.Fprintf(v, "\033[1;32m%s\033[0m\n", a.Title)
 
-	if len(selectedItem.TitleEnglish) > 0 && selectedItem.Title != selectedItem.TitleEnglish {
-		fmt.Fprintf(v, "%s\n", selectedItem.TitleEnglish)
+	if len(a.TitleEnglish) > 0 && a.Title != a.TitleEnglish {
+		fmt.Fprintf(v, "%s\n", a.TitleEnglish)
 	}
 }
 
-func (gui *Gui) renderInfo(v *gocui.View, selectedItem jikan.AnimeBase) {
-	fmt.Fprintf(v, "Type: %s\n", selectedItem.Type)
-	fmt.Fprintf(v, "Episodes: %d\n", selectedItem.Episodes)
-	fmt.Fprintf(v, "Status: %s\n", selectedItem.Status)
-	displayMalDateRange(v, "Aried: %s to %s\n", selectedItem.Aired)
-	fmt.Fprintf(v, "Source: %s\n", selectedItem.Source)
-	displayMalItems(v, "Genre: %s\n", selectedItem.Genres)
-	displayMalItems(v, "Theme: %s\n", selectedItem.Themes)
-	fmt.Fprintf(v, "Duration: %s\n", selectedItem.Duration)
-	fmt.Fprintf(v, "Rating: %s\n", selectedItem.Rating)
+func (gui *Gui) renderInfo(v *gocui.View, a ani.AnimeDetails) {
+	fmt.Fprintf(v, "Type: %s\n", a.Type)
+	fmt.Fprintf(v, "Episodes: %d\n", a.NumberEpisodes)
+	fmt.Fprintf(v, "Status: %s\n", a.Status)
+	displayDateRange(v, "Aried: %s to %s\n", a.AiredFrom, a.AiredTo)
+	fmt.Fprintf(v, "Source: %s\n", a.Source)
+	displayItems(v, "Genre: %s\n", a.Genres)
+	displayItems(v, "Theme: %s\n", a.Themes)
+	fmt.Fprintf(v, "Rating: %s\n", a.Rating)
 }
 
-func (gui *Gui) renderSynopsis(v *gocui.View, selectedItem jikan.AnimeBase) {
-	fmt.Fprintf(v, "Synopsis:\n%s\n", selectedItem.Synopsis)
+func (gui *Gui) renderSynopsis(v *gocui.View, a ani.AnimeDetails) {
+	fmt.Fprintf(v, "Synopsis:\n%s\n", a.Synopsis)
 }
 
-func displayMalDateRange(v *gocui.View, m string, date jikan.DateRange) {
-	fromDate := time.Date(date.Prop.From.Year, time.Month(date.Prop.From.Month), date.Prop.From.Day, 0, 0, 0, 0, time.UTC)
-	toDate := time.Date(date.Prop.To.Year, time.Month(date.Prop.To.Month), date.Prop.To.Day, 0, 0, 0, 0, time.UTC)
+func displayDateRange(v *gocui.View, m string, from time.Time, to time.Time) {
 	layout := "Jan 2, 2006"
-	fmt.Fprintf(v, m, fromDate.Format(layout), toDate.Format(layout))
+	fmt.Fprintf(v, m, from.Format(layout), to.Format(layout))
 }
 
-func displayMalItems(v *gocui.View, m string, items []jikan.MalItem) {
+func displayItems(v *gocui.View, m string, items []string) {
 	for _, i := range items {
-		fmt.Fprint(v, m, i.Name)
+		fmt.Fprint(v, m, i)
 	}
 }

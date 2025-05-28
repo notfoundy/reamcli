@@ -64,7 +64,7 @@ func (gui *Gui) createAllViews() error {
 
 	gui.Views.Seasons.Title = "Seasons"
 	gui.Views.Seasons.Highlight = true
-	gui.Views.Seasons.Autoscroll = true
+	gui.Views.Seasons.Autoscroll = false
 	gui.Views.Seasons.Wrap = true
 
 	gui.Views.About.Title = "About"

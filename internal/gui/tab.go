@@ -2,17 +2,18 @@ package gui
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/awesome-gocui/gocui"
-	"github.com/darenliang/jikan-go"
 	"github.com/notfoundy/reamcli/internal/ani"
+	"github.com/notfoundy/reamcli/internal/player"
 )
 
 type Tab struct {
 	Index         int
 	Key           string
 	Render        func() error
-	Data          *jikan.Season
+	Data          []*ani.Anime
 	SelectedIndex int
 	IsActive      bool
 	Episodes      Episodes
@@ -30,10 +31,22 @@ func (gui *Gui) setSearchTab() Tab {
 }
 
 func (gui *Gui) setSeasonsTab() Tab {
-	data, err := ani.GetSeasonNow()
+	// data, err := ani.GetSeasonNow()
+	seasonName := "Spring" // ou "Spring", "Fall", "Winter"
+	year := 2025
+	data, err := ani.GetSeasonAnimes(seasonName, year)
 	if err != nil {
-		return Tab{}
+		gui.Log.Error(err)
+		return Tab{
+			Index: 1,
+			Key:   "seasons",
+			Render: func() error {
+				return gui.renderString(gui.g, "seasons", "Error can't load animes")
+			},
+			IsActive: true,
+		}
 	}
+	gui.Log.Debug(fmt.Sprintf("nombre animes : %d", len(data)))
 
 	tab := Tab{
 		Index: 1,
@@ -132,7 +145,7 @@ func (gui *Gui) nextItem(g *gocui.Gui, v *gocui.View) error {
 		return err
 	}
 
-	if tab.SelectedIndex < len(tab.Data.Data)-1 {
+	if tab.SelectedIndex < len(tab.Data)-1 {
 		tab.SelectedIndex++
 	}
 	return gui.renderTabList("seasons")
@@ -156,15 +169,31 @@ func (gui *Gui) handleEnterTab(g *gocui.Gui, v *gocui.View) error {
 	if err != nil {
 		return err
 	}
-	selectedItem := tab.Data.Data[tab.SelectedIndex]
-	tab.Episodes = gui.setEpisodesList(selectedItem.MalId)
+
+	selectedItem := tab.Data[tab.SelectedIndex]
+	malId, err := strconv.Atoi(selectedItem.MalId)
+	if err != nil {
+		return err
+	}
+	tab.Episodes = gui.setEpisodesList(malId)
+
+	// BUG: need to lock other views when we play smething
 	return gui.createEpisodesPopup("List of episodes", func(g *gocui.Gui, v *gocui.View) error {
-		// WARN: will lock you with the episodes popup for now
-		gui.Log.Debug("Func to play the episode")
+		msg := fmt.Sprintf("Playing episode %d : %s", tab.Episodes.SelectedIndex+1, tab.Episodes.Data.Data[tab.Episodes.SelectedIndex].Title)
+		gui.renderString(g, v.Name(), msg)
+		url, err := ani.GetEpisodeUrl()
+		if err != nil {
+			return err
+		}
+		go func() {
+			player.Play(url)
+			tab.Episodes.Render()
+		}()
 		return nil
 	}, func(g *gocui.Gui, v *gocui.View) error {
 		g.DeleteView(v.Name())
 		gui.g.SetCurrentView(fromView.Name())
+
 		return nil
 	})
 }

@@ -9,7 +9,7 @@ type Anime struct {
 	MalId             string
 	AnimeDetails      AnimeDetails
 	AvailableEpisodes AvailableEpisodes
-	Episodes          []Episode
+	Episodes          []*Episode
 }
 
 type AnimeDetails struct {
@@ -36,17 +36,17 @@ type AvailableEpisodes struct {
 }
 
 type Episode struct {
-	Number  int      `json:"episodeNum"`
-	Title   string   `json:"episodeString,omitempty"`
-	AirDate string   `json:"airDate,omitempty"`
-	Sources []Source `json:"sourceUrls"`
+	Number    int       `json:"episodeNum"`
+	Title     string    `json:"episodeString,omitempty"`
+	AiredDate time.Time `json:"airDate"`
+	Sources   []*Source `json:"sourceUrls"`
 }
 
 type Source struct {
-	Name       string  `json:"name"`
-	Priority   float64 `json:"priority"`
-	StreamType string  `json:"type"`
-	EncodedURL string  `json:"sourceUrl"`
+	Name      string  `json:"name"`
+	Priority  float64 `json:"priority"`
+	Type      string  `json:"type"`
+	SourceUrl string  `json:"sourceUrl"`
 }
 
 const (

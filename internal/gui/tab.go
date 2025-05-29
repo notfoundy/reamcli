@@ -2,7 +2,6 @@ package gui
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/awesome-gocui/gocui"
 	"github.com/notfoundy/reamcli/internal/ani"
@@ -16,7 +15,7 @@ type Tab struct {
 	Data          []*ani.Anime
 	SelectedIndex int
 	IsActive      bool
-	Episodes      Episodes
+	Episodes      EpisodesModal
 }
 
 func (gui *Gui) setSearchTab() Tab {
@@ -171,11 +170,7 @@ func (gui *Gui) handleEnterTab(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	selectedItem := tab.Data[tab.SelectedIndex]
-	malId, err := strconv.Atoi(selectedItem.MalId)
-	if err != nil {
-		return err
-	}
-	tab.Episodes = gui.setEpisodesList(malId)
+	tab.Episodes = gui.setEpisodesList(selectedItem, "sub")
 
 	// BUG: need to lock other views when we play smething
 	return gui.createEpisodesPopup("List of episodes", func(g *gocui.Gui, v *gocui.View) error {

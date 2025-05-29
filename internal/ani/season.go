@@ -100,7 +100,7 @@ func GetSeasonAnimes(season string, year int) ([]*Anime, error) {
 					Dub: r.AvailableEpisodes.Dub,
 					Raw: r.AvailableEpisodes.Raw,
 				},
-				Episodes: []Episode{},
+				Episodes: []*Episode{},
 			}
 			animes = append(animes, &anime)
 		}

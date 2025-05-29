@@ -31,7 +31,6 @@ func (gui *Gui) setViewContent(v *gocui.View, s string) error {
 	return nil
 }
 
-// BUG: the first item is white and bold
 func (gui *Gui) renderTabList(viewName string) error {
 	tab, err := gui.getCurrentTabOnTop()
 	if err != nil {
@@ -89,9 +88,9 @@ func (gui *Gui) renderEpisodesList(viewName string) error {
 	episodes := tab.Episodes
 	var builder strings.Builder
 
-	for i, item := range episodes.Data.Data {
+	for i, item := range episodes.Data {
 		indexStr := fmt.Sprintf("%d - ", i+1)
-		airedSince := formatAiredDate(item.Aired)
+		airedSince := formatAiredDate(item.AiredDate)
 
 		if i == episodes.SelectedIndex {
 			builder.WriteString("\033[31m➤\033[0m ")

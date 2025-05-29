@@ -2,19 +2,18 @@ package gui
 
 import (
 	"github.com/awesome-gocui/gocui"
-	"github.com/darenliang/jikan-go"
 	"github.com/notfoundy/reamcli/internal/ani"
 )
 
-type Episodes struct {
-	Data          *jikan.AnimeEpisodes
+type EpisodesModal struct {
+	Data          []*ani.Episode
 	Render        func() error
 	SelectedIndex int
 }
 
-func (gui *Gui) setEpisodesList(malId int) Episodes {
-	ep, _ := ani.GetAiredEpisode(malId)
-	return Episodes{
+func (gui *Gui) setEpisodesList(anime *ani.Anime, translation string) EpisodesModal {
+	ep, _ := ani.GetEpisodesAnimes(anime, translation)
+	return EpisodesModal{
 		Data: ep,
 		Render: func() error {
 			return gui.renderEpisodesList("episodes")
@@ -40,7 +39,6 @@ func (gui *Gui) prepareEpisodesPopup(title string) error {
 	if err != nil {
 		return nil
 	}
-	// DEGUG: still have eps
 
 	x0, y0, x1, y1 := gui.getEpisodesPopupDimensions(tab.Episodes.Data)
 	v, err := gui.g.SetView("episodes", x0, y0, x1, y1, 0)
@@ -63,10 +61,10 @@ func (gui *Gui) prepareEpisodesPopup(title string) error {
 	return nil
 }
 
-func (gui *Gui) getEpisodesPopupDimensions(episodes *jikan.AnimeEpisodes) (int, int, int, int) {
+func (gui *Gui) getEpisodesPopupDimensions(episodes []*ani.Episode) (int, int, int, int) {
 	width, height := gui.g.Size()
 	panelWidth := width / 2
-	panelHeight := int(float32(len(episodes.Data)) * 1.25)
+	panelHeight := int(float32(len(episodes)) * 1.25)
 	return width/2 - panelWidth/2,
 		height/2 - panelHeight/2 - panelHeight%2 - 1,
 		width/2 + panelWidth/2,
@@ -110,10 +108,6 @@ func (gui *Gui) setKeyBindings(g *gocui.Gui, handleConfirm, handleClose func(*go
 
 func (gui *Gui) wrappedConfirmationFunction(function func(*gocui.Gui, *gocui.View) error) func(*gocui.Gui, *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		if err := gui.handleEpisodePopupClose(); err != nil {
-			return err
-		}
-
 		if function != nil {
 			if err := function(g, v); err != nil {
 				return err
@@ -124,18 +118,13 @@ func (gui *Gui) wrappedConfirmationFunction(function func(*gocui.Gui, *gocui.Vie
 	}
 }
 
-func (gui *Gui) handleEpisodePopupClose() error {
-	gui.g.DeleteKeybindings("episodes")
-	return nil
-}
-
 func (gui *Gui) nextEpisode(g *gocui.Gui, v *gocui.View) error {
 	tab, err := gui.getCurrentTabOnTop()
 	if err != nil {
 		return err
 	}
 
-	if tab.Episodes.SelectedIndex < len(tab.Episodes.Data.Data)-1 {
+	if tab.Episodes.SelectedIndex < len(tab.Episodes.Data)-1 {
 		tab.Episodes.SelectedIndex++
 	}
 	return tab.Episodes.Render()

@@ -12,9 +12,11 @@ type EpisodesModal struct {
 }
 
 func (gui *Gui) setEpisodesList(anime *ani.Anime, translation string) EpisodesModal {
-	ep, _ := ani.GetEpisodesAnimes(anime, translation)
+	if len(anime.Episodes) == 0 {
+		anime.Episodes, _ = ani.GetEpisodesAnimes(anime, translation)
+	}
 	return EpisodesModal{
-		Data: ep,
+		Data: anime.Episodes,
 		Render: func() error {
 			return gui.renderEpisodesList("episodes")
 		},

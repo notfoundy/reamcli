@@ -83,6 +83,12 @@ func (gui *Gui) setKeyBindings(g *gocui.Gui, handleConfirm, handleClose func(*go
 		},
 		{
 			ViewName: "episodes",
+			Key:      'q',
+			Modifier: gocui.ModNone,
+			Handler:  gui.wrappedConfirmationFunction(handleClose),
+		},
+		{
+			ViewName: "episodes",
 			Key:      gocui.KeyEnter,
 			Modifier: gocui.ModNone,
 			Handler:  gui.wrappedConfirmationFunction(handleConfirm),
@@ -95,7 +101,19 @@ func (gui *Gui) setKeyBindings(g *gocui.Gui, handleConfirm, handleClose func(*go
 		},
 		{
 			ViewName: "episodes",
+			Key:      gocui.KeyArrowDown,
+			Modifier: gocui.ModNone,
+			Handler:  gui.nextEpisode,
+		},
+		{
+			ViewName: "episodes",
 			Key:      'k',
+			Modifier: gocui.ModNone,
+			Handler:  gui.PreviousEpisode,
+		},
+		{
+			ViewName: "episodes",
+			Key:      gocui.KeyArrowUp,
 			Modifier: gocui.ModNone,
 			Handler:  gui.PreviousEpisode,
 		},

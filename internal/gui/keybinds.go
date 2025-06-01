@@ -43,7 +43,19 @@ func (gui *Gui) GetInitialKeybindings() []*Binding {
 		},
 		{
 			ViewName: "seasons",
+			Key:      gocui.KeyArrowDown,
+			Modifier: gocui.ModNone,
+			Handler:  gui.nextItem,
+		},
+		{
+			ViewName: "seasons",
 			Key:      'k',
+			Modifier: gocui.ModNone,
+			Handler:  gui.previousItem,
+		},
+		{
+			ViewName: "seasons",
+			Key:      gocui.KeyArrowUp,
 			Modifier: gocui.ModNone,
 			Handler:  gui.previousItem,
 		},

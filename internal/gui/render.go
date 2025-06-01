@@ -106,7 +106,7 @@ func (gui *Gui) renderEpisodesList(viewName string) error {
 }
 
 func formatAiredDate(t time.Time) string {
-	now := time.Now()
+	now := time.Now().UTC()
 	if t.After(now) {
 		return ""
 	}

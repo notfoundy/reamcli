@@ -2,6 +2,8 @@ package ani
 
 import (
 	"encoding/json"
+	"log"
+	"os"
 	"strconv"
 	"time"
 )
@@ -44,18 +46,21 @@ func GetEpisodesAnimes(anime *Anime, translation string) ([]*Episode, error) {
 	}
 	`
 
-	vars := map[string]any{
-		"showId":          anime.Id,
-		"translationType": translation,
-		"episodeString":   "1",
-	}
+	var vars map[string]any
+	var req Request
 
-	req := Request{
-		Query:     query,
-		Variables: vars,
-	}
+	for i := 1; i <= anime.AvailableEpisodes.Sub; i++ {
+		vars = map[string]any{
+			"showId":          anime.Id,
+			"translationType": translation,
+			"episodeString":   strconv.Itoa(i),
+		}
 
-	for i := range anime.AvailableEpisodes.Sub {
+		req = Request{
+			Query:     query,
+			Variables: vars,
+		}
+
 		resp, err := doRequest(allanimeAPI, allanimeReferer, userAgent, req)
 		if err != nil {
 			return nil, err
@@ -86,14 +91,29 @@ func GetEpisodesAnimes(anime *Anime, translation string) ([]*Episode, error) {
 		}
 
 		date := result.Episode.UploadDate
+		airedDate := time.Date(date.Year, time.Month(date.Month), date.Date, 0, 0, 0, 0, time.UTC)
+
+		file, err := os.OpenFile("debug.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalf("Erreur ouverture fichier log: %v", err)
+		}
+		defer file.Close()
+		logger := log.New(file, "LOG: ", log.Ldate|log.Ltime|log.Lshortfile)
+		logger.Printf("Date = %v", date)
+		logger.Printf("AiredDate = %s", airedDate)
+
 		episode := &Episode{
 			Number:    i,
-			AiredDate: time.Date(date.Year, time.Month(date.Month), date.Date, 0, 0, 0, 0, time.UTC),
+			AiredDate: time.Date(date.Year, time.Month(date.Month+1), date.Date, 0, 0, 0, 0, time.UTC),
 			Sources:   sources,
 		}
 
 		anime.Episodes = append(anime.Episodes, episode)
-		vars["episodeString"] = strconv.Itoa(i)
+		// vars["episodeString"] = strconv.Itoa(i)
+		// req = Request{
+		// 	Query:     query,
+		// 	Variables: vars,
+		// }
 	}
 
 	episodes := anime.Episodes

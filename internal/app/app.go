@@ -23,27 +23,25 @@ func NewApp() (*App, error) {
 		ErrorChan: make(chan error),
 	}
 
-	var err error
-	app.Log = log.NewLogger()
-	app.Gui, err = gui.NewGui(app.Log, app.ErrorChan)
-	if err != nil {
-		return app, err
-	}
-
 	clientId := viper.GetString("mal_client_id")
 	callbackUrl := "http://localhost:" + strconv.Itoa(utils.GetCallbackPort()) + "/callback"
 	client := mal.NewClient(
 		clientId,
 		callbackUrl,
 	)
-
 	if client.AccessToken == "" {
 		if err := client.StartOAuth(); err != nil {
 			return nil, err
 		}
 	}
-
 	app.MalClient = client
+
+	var err error
+	app.Log = log.NewLogger()
+	app.Gui, err = gui.NewGui(app.Log, app.ErrorChan, app.MalClient)
+	if err != nil {
+		return app, err
+	}
 
 	return app, nil
 }

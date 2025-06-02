@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/awesome-gocui/gocui"
+	"github.com/notfoundy/reamcli/internal/mal"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,6 +14,7 @@ type Gui struct {
 	Views     Views
 	Log       *logrus.Logger
 	Tabs      Tabs
+	MalClient *mal.Client
 	ErrorChan chan error
 }
 
@@ -22,10 +24,11 @@ type Tabs struct {
 	About   Tab
 }
 
-func NewGui(log *logrus.Logger, errorChan chan error) (*Gui, error) {
+func NewGui(log *logrus.Logger, errorChan chan error, malClient *mal.Client) (*Gui, error) {
 	gui := &Gui{
 		Log:       log,
 		ErrorChan: errorChan,
+		MalClient: malClient,
 	}
 
 	return gui, nil

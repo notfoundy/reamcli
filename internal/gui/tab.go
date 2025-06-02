@@ -5,6 +5,7 @@ import (
 
 	"github.com/awesome-gocui/gocui"
 	"github.com/notfoundy/reamcli/internal/ani"
+	"github.com/notfoundy/reamcli/internal/mal"
 	"github.com/notfoundy/reamcli/internal/player"
 )
 
@@ -29,8 +30,8 @@ func (gui *Gui) setSearchTab() Tab {
 	}
 }
 
+// TODO: Use enums for the season name
 func (gui *Gui) setSeasonsTab() Tab {
-	// data, err := ani.GetSeasonNow()
 	seasonName := "Spring" // ou "Spring", "Fall", "Winter"
 	year := 2025
 	data, err := ani.GetSeasonAnimes(seasonName, year)
@@ -169,16 +170,21 @@ func (gui *Gui) handleEnterTab(g *gocui.Gui, v *gocui.View) error {
 		return err
 	}
 
-	selectedItem := tab.Data[tab.SelectedIndex]
-	tab.Episodes = gui.setEpisodesList(selectedItem, "sub")
+	anime := tab.Data[tab.SelectedIndex]
+	tab.Episodes = gui.setEpisodesList(anime, "sub")
 
 	// BUG: need to lock other views when we play smething
 	return gui.createEpisodesPopup("List of episodes", func(g *gocui.Gui, v *gocui.View) error {
-		msg := fmt.Sprintf("Playing episode %d : %s", tab.Episodes.SelectedIndex+1, tab.Episodes.Data[tab.Episodes.SelectedIndex].Title)
+		msg := fmt.Sprintf("Playing episode %d : %s", tab.Episodes.SelectedIndex+1, anime.AnimeDetails.Title)
 		gui.renderString(g, v.Name(), msg)
 		go func() {
 			player.Launch(tab.Episodes.Data[tab.Episodes.SelectedIndex])
 			tab.Episodes.Render()
+			// Update the anime status for MAL
+			go func() {
+				gui.Log.Debug(tab.Episodes.SelectedIndex + 1)
+				gui.MalClient.UpdateAnimeStatus(anime.MalId, mal.StatusWatching, tab.Episodes.SelectedIndex+1)
+			}()
 		}()
 		return nil
 	}, func(g *gocui.Gui, v *gocui.View) error {

@@ -174,14 +174,10 @@ func (gui *Gui) handleEnterTab(g *gocui.Gui, v *gocui.View) error {
 
 	// BUG: need to lock other views when we play smething
 	return gui.createEpisodesPopup("List of episodes", func(g *gocui.Gui, v *gocui.View) error {
-		msg := fmt.Sprintf("Playing episode %d : %s", tab.Episodes.SelectedIndex+1, tab.Episodes.Data.Data[tab.Episodes.SelectedIndex].Title)
+		msg := fmt.Sprintf("Playing episode %d : %s", tab.Episodes.SelectedIndex+1, tab.Episodes.Data[tab.Episodes.SelectedIndex].Title)
 		gui.renderString(g, v.Name(), msg)
-		url, err := ani.GetEpisodeUrl()
-		if err != nil {
-			return err
-		}
 		go func() {
-			player.Play(url)
+			player.Launch(tab.Episodes.Data[tab.Episodes.SelectedIndex])
 			tab.Episodes.Render()
 		}()
 		return nil

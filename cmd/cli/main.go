@@ -47,8 +47,7 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		cfgDir = utils.GetConfigDir()
-		err := utils.EnsureConfigDir(cfgDir)
+		cfgDir, err := utils.GetConfigDir()
 		cobra.CheckErr(err)
 		cfgPath = filepath.Join(cfgDir, "config.yaml")
 		viper.SetConfigFile(cfgPath)

@@ -19,7 +19,7 @@ type Token struct {
 const tokenFileName = "mal_token.json"
 
 func (c *Client) getTokenPath() string {
-	cfgDir := utils.GetConfigDir()
+	cfgDir, _ := utils.GetConfigDir()
 	return filepath.Join(cfgDir, tokenFileName)
 }
 

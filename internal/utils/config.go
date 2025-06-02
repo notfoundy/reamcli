@@ -12,29 +12,44 @@ import (
 )
 
 const (
-	cfgDirName = "reamcli"
-	charset    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	appName = "reamcli"
+	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-func GetConfigDir() string {
+func getBaseDir(xdgVar, fallbackSubdir, winEnvVar string) (string, error) {
 	if runtime.GOOS == "windows" {
-		return filepath.Join(os.Getenv("APPDATA"), cfgDirName)
+		base := os.Getenv(winEnvVar)
+		if base == "" {
+			return "", fmt.Errorf("%s non défini", winEnvVar)
+		}
+		return filepath.Join(base, appName), nil
 	}
-	xdg := os.Getenv("XDG_CONFIG_HOME")
-	if xdg == "" {
-		home, _ := os.UserHomeDir()
-		xdg = filepath.Join(home, ".config")
+
+	base := os.Getenv(xdgVar)
+	if base == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		base = filepath.Join(home, fallbackSubdir)
 	}
-	return filepath.Join(xdg, cfgDirName)
+	return filepath.Join(base, appName), nil
 }
 
-func EnsureConfigDir(dir string) error {
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		if err := os.MkdirAll(dir, 0700); err != nil {
-			return fmt.Errorf("failed to create config dir %s: %w", dir, err)
-		}
+func GetConfigDir() (string, error) {
+	return getBaseDir("XDG_CONFIG_HOME", ".config", "APPDATA")
+}
+
+func GetLogPath() (string, error) {
+	base, err := getBaseDir("XDG_STATE_HOME", ".local/state", "LOCALAPPDATA")
+	if err != nil {
+		return "", err
 	}
-	return nil
+	logDir := filepath.Join(base, "log")
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		return "", err
+	}
+	return filepath.Join(logDir, "app.log"), nil
 }
 
 func GetCallbackPort() int {

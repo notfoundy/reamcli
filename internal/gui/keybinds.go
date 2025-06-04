@@ -69,6 +69,18 @@ func (gui *Gui) GetInitialKeybindings() []*Binding {
 				Modifier: gocui.ModNone,
 				Handler:  gui.handleEnterTab,
 			},
+			&Binding{
+				ViewName: tab.Key,
+				Key:      '/',
+				Modifier: gocui.ModNone,
+				Handler:  gui.openFilter,
+			},
+			&Binding{
+				ViewName: tab.Key,
+				Key:      'f',
+				Modifier: gocui.ModNone,
+				Handler:  gui.openFilter,
+			},
 		)
 	}
 

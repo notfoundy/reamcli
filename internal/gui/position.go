@@ -26,6 +26,11 @@ func (gui *Gui) getPositionByViewName(name string, frameOffset int) Position {
 		x1 = sideSectionWeight - frameOffset
 		y0 = 1
 		y1 = maxY - 2
+	case "filter":
+		x0 = sideSectionWeight + frameOffset
+		x1 = sideSectionWeight + mainSectionWeight - frameOffset - 1
+		y0 = maxY - 4
+		y1 = maxY - 2
 	default: // we assume the default case only contain tabs for the main panel
 		x0 = sideSectionWeight + frameOffset
 		x1 = sideSectionWeight + mainSectionWeight - frameOffset - 1

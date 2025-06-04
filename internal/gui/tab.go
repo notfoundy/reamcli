@@ -13,6 +13,7 @@ type Tab struct {
 	Index         int
 	Key           string
 	Render        func() error
+	OriginalData  []*ani.Anime
 	Data          []*ani.Anime
 	SelectedIndex int
 	IsActive      bool
@@ -49,9 +50,10 @@ func (gui *Gui) setSeasonsTab() Tab {
 	gui.Log.Debug(fmt.Sprintf("nombre animes : %d", len(data)))
 
 	tab := Tab{
-		Index: 1,
-		Key:   "seasons",
-		Data:  data,
+		Index:        1,
+		Key:          "seasons",
+		OriginalData: data,
+		Data:         data,
 		Render: func() error {
 			return gui.renderTabList("seasons")
 		},

@@ -10,12 +10,13 @@ import (
 )
 
 type Gui struct {
-	g         *gocui.Gui
-	Views     Views
-	Log       *logrus.Logger
-	Tabs      Tabs
-	MalClient *mal.Client
-	ErrorChan chan error
+	g           *gocui.Gui
+	Views       Views
+	Log         *logrus.Logger
+	Tabs        Tabs
+	CacheFilter map[string]string
+	MalClient   *mal.Client
+	ErrorChan   chan error
 }
 
 type Tabs struct {
@@ -26,9 +27,10 @@ type Tabs struct {
 
 func NewGui(log *logrus.Logger, errorChan chan error, malClient *mal.Client) (*Gui, error) {
 	gui := &Gui{
-		Log:       log,
-		ErrorChan: errorChan,
-		MalClient: malClient,
+		Log:         log,
+		ErrorChan:   errorChan,
+		CacheFilter: make(map[string]string),
+		MalClient:   malClient,
 	}
 
 	return gui, nil

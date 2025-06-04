@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/awesome-gocui/gocui"
 	"github.com/notfoundy/reamcli/internal/ani"
@@ -72,8 +73,8 @@ func (gui *Gui) filterOnBufferChangeEditor(v *gocui.View, key gocui.Key, ch rune
 		}
 
 		var combinedTitles []string
-		for _, a := range tab.OriginalData {
-			combined := a.AnimeDetails.Title + " " + a.AnimeDetails.TitleEnglish
+		for i, a := range tab.OriginalData {
+			combined := strconv.Itoa(i+1) + " " + a.AnimeDetails.Title + " " + a.AnimeDetails.TitleEnglish
 			combinedTitles = append(combinedTitles, combined)
 		}
 

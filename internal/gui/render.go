@@ -8,6 +8,7 @@ import (
 
 	"github.com/awesome-gocui/gocui"
 	"github.com/mattn/go-runewidth"
+	"github.com/samber/lo"
 )
 
 func (gui *Gui) renderString(g *gocui.Gui, viewName string, s string) error {
@@ -70,15 +71,16 @@ func (gui *Gui) renderTabList(viewName string) error {
 
 	var prefix string
 	for i, s := range tab.Data {
-		prefix = "   "
+		prefix = "   000 - "
 		if i == tab.SelectedIndex {
-			prefix = "\033[31m➤\033[0m  "
+			prefix = "\033[31m➤\033[0m  000 - "
 		}
 		availableWidth := width - runewidth.StringWidth(stripAnsi(prefix))
+		index := lo.IndexOf(tab.OriginalData, s) + 1
 		if i == tab.SelectedIndex {
-			fmt.Fprintf(view, "\033[31m➤\033[0m  %s\n", truncate(s.AnimeDetails.Title, availableWidth))
+			fmt.Fprintf(view, "\033[31m➤\033[0m  %d - %s\n", index, truncate(s.AnimeDetails.Title, availableWidth))
 		} else {
-			fmt.Fprintf(view, "   %s\n", truncate(s.AnimeDetails.Title, availableWidth))
+			fmt.Fprintf(view, "   %d - %s\n", index, truncate(s.AnimeDetails.Title, availableWidth))
 		}
 	}
 	cursorY := max(tab.SelectedIndex-oy, 0)
